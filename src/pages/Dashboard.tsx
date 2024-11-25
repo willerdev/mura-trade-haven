@@ -17,26 +17,42 @@ const Dashboard = () => {
     script.src = 'https://s3.tradingview.com/tv.js';
     script.async = true;
     script.onload = () => {
-      if (containerRef.current) {
-        new window.TradingView.widget({
-          width: '100%',
-          height: '100%',
-          symbol: 'BINANCE:BTCUSDT',
-          interval: '1',
-          timezone: 'Etc/UTC',
-          theme: 'dark',
-          style: '1',
-          locale: 'en',
-          toolbar_bg: '#f1f3f6',
-          enable_publishing: false,
-          allow_symbol_change: true,
-          container_id: 'tradingview_chart'
-        });
+      try {
+        if (containerRef.current && window.TradingView) {
+          // Create widget without referencing window directly in the config
+          new window.TradingView.widget({
+            autosize: true,
+            symbol: 'BINANCE:BTCUSDT',
+            interval: '1',
+            timezone: 'Etc/UTC',
+            theme: 'dark',
+            style: '1',
+            locale: 'en',
+            toolbar_bg: '#f1f3f6',
+            enable_publishing: false,
+            allow_symbol_change: true,
+            container_id: 'tradingview_chart'
+          });
+        }
+      } catch (error) {
+        console.error('TradingView widget initialization error:', error);
       }
     };
+
+    // Cleanup function to remove the script when component unmounts
+    const cleanup = () => {
+      const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+
+    // Add script to document
     document.head.appendChild(script);
+
+    // Return cleanup function
     return () => {
-      script.remove();
+      cleanup();
     };
   }, []);
 

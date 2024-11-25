@@ -13,46 +13,58 @@ const Dashboard = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const initializeWidget = () => {
+      if (!containerRef.current || !window.TradingView) {
+        console.log('TradingView or container not ready');
+        return;
+      }
+
+      try {
+        const widgetOptions = {
+          autosize: true,
+          symbol: 'BINANCE:BTCUSDT',
+          interval: '1',
+          timezone: 'Etc/UTC',
+          theme: 'dark',
+          style: '1',
+          locale: 'en',
+          toolbar_bg: '#f1f3f6',
+          enable_publishing: false,
+          allow_symbol_change: true,
+          container_id: 'tradingview_chart'
+        };
+
+        new window.TradingView.widget(widgetOptions);
+        console.log('TradingView widget initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize TradingView widget:', error);
+      }
+    };
+
+    // Create and load TradingView script
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/tv.js';
     script.async = true;
-    script.onload = () => {
-      try {
-        if (containerRef.current && window.TradingView) {
-          // Create widget without referencing window directly in the config
-          new window.TradingView.widget({
-            autosize: true,
-            symbol: 'BINANCE:BTCUSDT',
-            interval: '1',
-            timezone: 'Etc/UTC',
-            theme: 'dark',
-            style: '1',
-            locale: 'en',
-            toolbar_bg: '#f1f3f6',
-            enable_publishing: false,
-            allow_symbol_change: true,
-            container_id: 'tradingview_chart'
-          });
-        }
-      } catch (error) {
-        console.error('TradingView widget initialization error:', error);
-      }
-    };
+    script.onload = initializeWidget;
+    script.onerror = () => console.error('Failed to load TradingView script');
+    
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
+    if (!existingScript) {
+      document.head.appendChild(script);
+    } else {
+      initializeWidget();
+    }
 
-    // Cleanup function to remove the script when component unmounts
-    const cleanup = () => {
-      const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
-
-    // Add script to document
-    document.head.appendChild(script);
-
-    // Return cleanup function
     return () => {
-      cleanup();
+      // Cleanup only if we added the script
+      if (!existingScript) {
+        script.remove();
+      }
+      // Clear the container
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
+      }
     };
   }, []);
 

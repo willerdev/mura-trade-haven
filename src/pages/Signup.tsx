@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
   const { toast } = useToast();
 
@@ -23,18 +25,13 @@ const Signup = () => {
       });
       return;
     }
+    setIsLoading(true);
     try {
       await signup(email, password);
-      toast({
-        title: "Success",
-        description: "Welcome to MuraTrade!",
-      });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create account. Please try again.",
-      });
+      console.error('Signup error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,6 +54,7 @@ const Signup = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full"
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -67,6 +65,7 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full"
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -77,10 +76,18 @@ const Signup = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full"
                 required
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                'Create Account'
+              )}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">

@@ -13,21 +13,29 @@ import {
 
 declare global {
   interface Window {
-    TradingView: any;
+    TradingView?: {
+      widget: new (config: any) => any;
+    };
   }
 }
 
 const Dashboard = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<any>(null);
 
   useEffect(() => {
     const initializeWidget = () => {
       if (!containerRef.current || !window.TradingView) {
-        console.log('TradingView or container not ready');
+        console.log('TradingView or container not available');
         return;
       }
 
       try {
+        // Clear previous widget instance if it exists
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+        }
+
         const widgetOptions = {
           autosize: true,
           symbol: 'BINANCE:BTCUSDT',
@@ -42,33 +50,32 @@ const Dashboard = () => {
           container_id: 'tradingview_chart'
         };
 
-        new window.TradingView.widget(widgetOptions);
-        console.log('TradingView widget initialized successfully');
+        // Create new widget instance
+        widgetRef.current = new window.TradingView.widget(widgetOptions);
+        console.log('TradingView widget initialized');
       } catch (error) {
         console.error('Failed to initialize TradingView widget:', error);
       }
     };
 
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/tv.js';
-    script.async = true;
-    script.onload = initializeWidget;
-    script.onerror = () => console.error('Failed to load TradingView script');
-    
-    const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
-    if (!existingScript) {
+    // Load TradingView script if not already loaded
+    if (!window.TradingView) {
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = initializeWidget;
+      script.onerror = () => console.error('Failed to load TradingView script');
       document.head.appendChild(script);
     } else {
       initializeWidget();
     }
 
+    // Cleanup function
     return () => {
-      if (!existingScript) {
-        script.remove();
-      }
       if (containerRef.current) {
         containerRef.current.innerHTML = '';
       }
+      widgetRef.current = null;
     };
   }, []);
 

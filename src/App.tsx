@@ -7,6 +7,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Deposit from "./pages/Deposit";
+import Withdraw from "./pages/Withdraw";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +23,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/deposit" element={<Deposit />} />
+            <Route path="/dashboard/withdraw" element={<Withdraw />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </AuthProvider>

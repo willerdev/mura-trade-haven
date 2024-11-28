@@ -396,6 +396,39 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_orders: {
+        Row: {
+          amount: string
+          created_at: string
+          id: string
+          price: string
+          status: string
+          trading_mode: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: string
+          created_at?: string
+          id?: string
+          price: string
+          status?: string
+          trading_mode: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: string
+          created_at?: string
+          id?: string
+          price?: string
+          status?: string
+          trading_mode?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       trading_parameters: {
         Row: {
           amount: number

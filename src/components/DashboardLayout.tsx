@@ -29,8 +29,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               <SheetContent>
                 <div className="flex flex-col space-y-4 mt-8">
                   <Button variant="ghost" onClick={() => navigate('/dashboard')}>Home</Button>
-                  <Button variant="ghost" onClick={() => navigate('/dashboard/deposit')}>Deposit</Button>
-                  <Button variant="ghost" onClick={() => navigate('/dashboard/withdraw')}>Withdraw</Button>
+                  <Button variant="ghost" onClick={() => navigate('/deposit')}>Deposit</Button>
+                  <Button variant="ghost" onClick={() => navigate('/withdraw')}>Withdraw</Button>
                   <Button variant="outline" onClick={logout}>Logout</Button>
                 </div>
               </SheetContent>
@@ -40,8 +40,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/dashboard')}>Home</Button>
-            <Button variant="ghost" onClick={() => navigate('/dashboard/deposit')}>Deposit</Button>
-            <Button variant="ghost" onClick={() => navigate('/dashboard/withdraw')}>Withdraw</Button>
+            <Button variant="ghost" onClick={() => navigate('/deposit')}>Deposit</Button>
+            <Button variant="ghost" onClick={() => navigate('/withdraw')}>Withdraw</Button>
             <Button variant="outline" onClick={logout}>Logout</Button>
           </div>
         </div>

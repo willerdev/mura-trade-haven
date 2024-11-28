@@ -17,52 +17,59 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   
   if (!user) {
+    // Redirect to login if not authenticated
+    console.log("User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
   
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard/deposit" 
-              element={
-                <ProtectedRoute>
-                  <Deposit />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/dashboard/withdraw" 
-              element={
-                <ProtectedRoute>
-                  <Withdraw />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log("App component rendered");
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/deposit" 
+                element={
+                  <ProtectedRoute>
+                    <Deposit />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/withdraw" 
+                element={
+                  <ProtectedRoute>
+                    <Withdraw />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

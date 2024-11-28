@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import TradingViewChart from '../components/TradingViewChart';
 import TradingParameters from '../components/TradingParameters';
+import ViewTradingParameters from '../components/ViewTradingParameters';
 import OrderHistory from '../components/OrderHistory';
 
 const Dashboard = () => {
@@ -43,7 +44,10 @@ const Dashboard = () => {
           <Card className="p-3">
             <h3 className="text-lg font-semibold mb-3">Quick Trade</h3>
             <div className="space-y-2">
-              <TradingParameters />
+              <div className="grid grid-cols-2 gap-2">
+                <TradingParameters />
+                <ViewTradingParameters />
+              </div>
               <Button className="w-full bg-green-500 hover:bg-green-600">Buy</Button>
               <Button className="w-full bg-red-500 hover:bg-red-600">Sell</Button>
             </div>
@@ -55,7 +59,10 @@ const Dashboard = () => {
           <Card className="p-4 mb-4">
             <h3 className="text-lg font-semibold mb-4">Place Trade</h3>
             <div className="space-y-4">
-              <TradingParameters />
+              <div className="grid grid-cols-2 gap-2">
+                <TradingParameters />
+                <ViewTradingParameters />
+              </div>
               <Button className="w-full bg-green-500 hover:bg-green-600">Buy</Button>
               <Button className="w-full bg-red-500 hover:bg-red-600">Sell</Button>
               <Button className="w-full" variant="outline">Auto Trade</Button>

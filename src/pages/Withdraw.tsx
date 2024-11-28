@@ -18,19 +18,19 @@ const Withdraw = () => {
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) return;
     setIsLoading(true);
     
     try {
       const { error } = await supabase
         .from('withdrawals')
-        .insert([
-          {
-            user_id: user?.id,
-            amount: parseFloat(amount),
-            currency,
-            wallet_address: walletAddress,
-          }
-        ]);
+        .insert({
+          user_id: user.id,
+          amount: parseFloat(amount),
+          currency,
+          wallet_address: walletAddress,
+          status: 'pending'
+        });
 
       if (error) throw error;
 
@@ -42,6 +42,7 @@ const Withdraw = () => {
       setAmount('');
       setWalletAddress('');
     } catch (error: any) {
+      console.error('Withdrawal error:', error.message);
       toast({
         variant: "destructive",
         title: "Error",

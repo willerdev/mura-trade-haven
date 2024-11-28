@@ -93,6 +93,36 @@ export type Database = {
         }
         Relationships: []
       }
+      deposits: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          status: string | null
+          user_id: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -363,6 +393,36 @@ export type Database = {
           status?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          status: string | null
+          user_id: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
         }
         Relationships: []
       }

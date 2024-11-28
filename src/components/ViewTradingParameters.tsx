@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../contexts/AuthContext';
@@ -26,8 +25,10 @@ const ViewTradingParameters = () => {
   const { user } = useAuth();
   
   const { data: parameters, isLoading } = useQuery({
-    queryKey: ['tradingParameters', user?.id],
+    queryKey: ['tradingParameters', user?.email],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
       const { data, error } = await supabase
         .from('trading_parameters')
         .select('*')
@@ -36,7 +37,7 @@ const ViewTradingParameters = () => {
       if (error) throw error;
       return data as TradingParameter[];
     },
-    enabled: !!user?.id
+    enabled: !!user?.email
   });
 
   return (

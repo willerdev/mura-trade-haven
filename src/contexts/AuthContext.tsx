@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
-  user: Session | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -15,24 +15,24 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session);
+      setUser(session?.user || null);
       setIsLoading(false);
-      if (session) navigate('/dashboard');
+      if (session?.user) navigate('/dashboard');
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session);
-      if (session) navigate('/dashboard');
+      setUser(session?.user || null);
+      if (session?.user) navigate('/dashboard');
     });
 
     return () => subscription.unsubscribe();

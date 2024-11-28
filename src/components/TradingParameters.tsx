@@ -25,7 +25,7 @@ const TradingParameters = () => {
   const { user } = useAuth();
 
   const handleSubmit = async () => {
-    if (!user?.id) {
+    if (!user?.email) {
       toast({
         title: "Error",
         description: "You must be logged in to set trading parameters",

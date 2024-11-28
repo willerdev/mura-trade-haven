@@ -25,19 +25,24 @@ const ViewTradingParameters = () => {
   const { user } = useAuth();
   
   const { data: parameters, isLoading } = useQuery({
-    queryKey: ['tradingParameters', user?.email],
+    queryKey: ['tradingParameters'],
     queryFn: async () => {
       if (!user?.id) return [];
       
       const { data, error } = await supabase
         .from('trading_parameters')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching trading parameters:', error);
+        throw error;
+      }
+      console.log('Fetched parameters:', data);
       return data as TradingParameter[];
     },
-    enabled: !!user?.email
+    enabled: !!user?.id
   });
 
   return (

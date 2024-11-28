@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,8 +6,17 @@ import TradingViewChart from '../components/TradingViewChart';
 import TradingParameters from '../components/TradingParameters';
 import ViewTradingParameters from '../components/ViewTradingParameters';
 import OrderHistory from '../components/OrderHistory';
+import OrderModal from '../components/OrderModal';
 
 const Dashboard = () => {
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy');
+
+  const handleOrderClick = (type: 'buy' | 'sell') => {
+    setOrderType(type);
+    setOrderModalOpen(true);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)]">
@@ -48,8 +58,18 @@ const Dashboard = () => {
                 <TradingParameters />
                 <ViewTradingParameters />
               </div>
-              <Button className="w-full bg-green-500 hover:bg-green-600">Buy</Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600">Sell</Button>
+              <Button 
+                className="w-full bg-green-500 hover:bg-green-600"
+                onClick={() => handleOrderClick('buy')}
+              >
+                Buy
+              </Button>
+              <Button 
+                className="w-full bg-red-500 hover:bg-red-600"
+                onClick={() => handleOrderClick('sell')}
+              >
+                Sell
+              </Button>
             </div>
           </Card>
         </div>
@@ -63,8 +83,18 @@ const Dashboard = () => {
                 <TradingParameters />
                 <ViewTradingParameters />
               </div>
-              <Button className="w-full bg-green-500 hover:bg-green-600">Buy</Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600">Sell</Button>
+              <Button 
+                className="w-full bg-green-500 hover:bg-green-600"
+                onClick={() => handleOrderClick('buy')}
+              >
+                Buy
+              </Button>
+              <Button 
+                className="w-full bg-red-500 hover:bg-red-600"
+                onClick={() => handleOrderClick('sell')}
+              >
+                Sell
+              </Button>
               <Button className="w-full" variant="outline">Auto Trade</Button>
             </div>
           </Card>
@@ -96,6 +126,13 @@ const Dashboard = () => {
         <div className="p-2 md:p-4 md:mr-80">
           <OrderHistory />
         </div>
+
+        {/* Order Modal */}
+        <OrderModal
+          isOpen={orderModalOpen}
+          onClose={() => setOrderModalOpen(false)}
+          type={orderType}
+        />
       </div>
     </DashboardLayout>
   );

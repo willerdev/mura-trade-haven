@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,32 @@ const TradingParameters = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  useEffect(() => {
+    const fetchExistingParameters = async () => {
+      if (!user?.id) return;
+      
+      const { data, error } = await supabase
+        .from('trading_parameters')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching parameters:', error);
+        return;
+      }
+      
+      if (data) {
+        setAmount(data.amount.toString());
+        setLeverage(data.leverage.toString());
+        setStopLoss(data.stop_loss.toString());
+        setTakeProfit(data.take_profit.toString());
+      }
+    };
+
+    fetchExistingParameters();
+  }, [user]);
+
   const handleSubmit = async () => {
     if (!user?.email) {
       toast({
@@ -37,15 +63,31 @@ const TradingParameters = () => {
     try {
       setIsSubmitting(true);
       
-      const { error } = await supabase
+      const { data: existingParams } = await supabase
         .from('trading_parameters')
-        .insert({
-          user_id: user.id,
-          amount: parseFloat(amount),
-          leverage: parseFloat(leverage),
-          stop_loss: parseFloat(stopLoss),
-          take_profit: parseFloat(takeProfit),
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      const params = {
+        user_id: user.id,
+        amount: parseFloat(amount),
+        leverage: parseFloat(leverage),
+        stop_loss: parseFloat(stopLoss),
+        take_profit: parseFloat(takeProfit),
+      };
+
+      let error;
+      if (existingParams) {
+        ({ error } = await supabase
+          .from('trading_parameters')
+          .update(params)
+          .eq('user_id', user.id));
+      } else {
+        ({ error } = await supabase
+          .from('trading_parameters')
+          .insert([params]));
+      }
 
       if (error) throw error;
 
@@ -53,12 +95,6 @@ const TradingParameters = () => {
         title: "Success",
         description: "Trading parameters have been saved",
       });
-
-      // Reset form
-      setAmount('');
-      setLeverage('');
-      setStopLoss('');
-      setTakeProfit('');
       
     } catch (error: any) {
       console.error('Error saving trading parameters:', error);

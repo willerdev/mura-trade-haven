@@ -7,6 +7,7 @@ import TradingParameters from '../components/TradingParameters';
 import ViewTradingParameters from '../components/ViewTradingParameters';
 import OrderHistory from '../components/OrderHistory';
 import OrderModal from '../components/OrderModal';
+import TradingActivationModal from '../components/TradingActivationModal';
 
 const Dashboard = () => {
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -58,6 +59,7 @@ const Dashboard = () => {
                 <TradingParameters />
                 <ViewTradingParameters />
               </div>
+              <TradingActivationModal />
               <Button 
                 className="w-full bg-green-500 hover:bg-green-600"
                 onClick={() => handleOrderClick('buy')}
@@ -83,6 +85,7 @@ const Dashboard = () => {
                 <TradingParameters />
                 <ViewTradingParameters />
               </div>
+              <TradingActivationModal />
               <Button 
                 className="w-full bg-green-500 hover:bg-green-600"
                 onClick={() => handleOrderClick('buy')}
@@ -95,10 +98,8 @@ const Dashboard = () => {
               >
                 Sell
               </Button>
-              <Button className="w-full" variant="outline">Auto Trade</Button>
             </div>
           </Card>
-
           <Card className="p-4">
             <h3 className="text-lg font-semibold mb-4">Trading Stats</h3>
             <div className="space-y-2">
@@ -122,7 +123,6 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Order History - Responsive */}
         <div className="p-2 md:p-4 md:mr-80">
           <OrderHistory />
         </div>

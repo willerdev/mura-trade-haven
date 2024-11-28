@@ -396,6 +396,36 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_parameters: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          leverage: number
+          stop_loss: number
+          take_profit: number
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          leverage: number
+          stop_loss: number
+          take_profit: number
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          leverage?: number
+          stop_loss?: number
+          take_profit?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       withdrawals: {
         Row: {
           amount: number

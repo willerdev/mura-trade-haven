@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 const TradingParameters = () => {
@@ -16,6 +20,57 @@ const TradingParameters = () => {
   const [leverage, setLeverage] = useState<string>('');
   const [stopLoss, setStopLoss] = useState<string>('');
   const [takeProfit, setTakeProfit] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to set trading parameters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      
+      const { error } = await supabase
+        .from('trading_parameters')
+        .insert({
+          user_id: user.id,
+          amount: parseFloat(amount),
+          leverage: parseFloat(leverage),
+          stop_loss: parseFloat(stopLoss),
+          take_profit: parseFloat(takeProfit),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Trading parameters have been saved",
+      });
+
+      // Reset form
+      setAmount('');
+      setLeverage('');
+      setStopLoss('');
+      setTakeProfit('');
+      
+    } catch (error: any) {
+      console.error('Error saving trading parameters:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save trading parameters",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog>
@@ -82,6 +137,17 @@ const TradingParameters = () => {
               placeholder="Enter take profit price"
             />
           </div>
+        </div>
+        <div className="flex justify-end space-x-4">
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button 
+            onClick={handleSubmit}
+            disabled={isSubmitting || !amount || !leverage || !stopLoss || !takeProfit}
+          >
+            {isSubmitting ? "Saving..." : "Save Parameters"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

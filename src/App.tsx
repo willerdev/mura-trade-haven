@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ThemeProvider } from "./components/ThemeProvider";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
@@ -33,66 +34,68 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              
-              {/* Protected routes */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/markets" 
-                element={
-                  <ProtectedRoute>
-                    <Markets />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/trade" 
-                element={
-                  <ProtectedRoute>
-                    <Trade />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/positions" 
-                element={
-                  <ProtectedRoute>
-                    <Positions />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/account" 
-                element={
-                  <ProtectedRoute>
-                    <Account />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Default routes */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-            <MobileNavigation />
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light" storageKey="app-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                
+                {/* Protected routes */}
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/markets" 
+                  element={
+                    <ProtectedRoute>
+                      <Markets />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/trade" 
+                  element={
+                    <ProtectedRoute>
+                      <Trade />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/positions" 
+                  element={
+                    <ProtectedRoute>
+                      <Positions />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/account" 
+                  element={
+                    <ProtectedRoute>
+                      <Account />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Default routes */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+              <MobileNavigation />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

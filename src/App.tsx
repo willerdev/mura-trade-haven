@@ -20,6 +20,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   console.log("Protected route check - User:", user);
   
+  useEffect(() => {
+    console.log("ProtectedRoute effect - User status:", !!user);
+  }, [user]);
+  
   if (!user) {
     console.log("User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
@@ -34,7 +38,7 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="app-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="app-theme">
         <TooltipProvider>
           <Toaster />
           <Sonner />

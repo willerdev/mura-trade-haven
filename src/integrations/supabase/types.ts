@@ -396,6 +396,30 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_accounts: {
+        Row: {
+          account_type: string
+          balance: number
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          account_type: string
+          balance: number
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          account_type?: string
+          balance?: number
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trading_orders: {
         Row: {
           amount: string

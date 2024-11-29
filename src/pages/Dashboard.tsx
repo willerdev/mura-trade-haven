@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '../components/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,10 +9,35 @@ import ViewTradingParameters from '../components/ViewTradingParameters';
 import OrderHistory from '../components/OrderHistory';
 import OrderModal from '../components/OrderModal';
 import TradingActivationModal from '../components/TradingActivationModal';
+import DepositModal from '../components/DepositModal';
+import WithdrawModal from '../components/WithdrawModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '../contexts/AuthContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Dashboard = () => {
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy');
+  const [selectedAccount, setSelectedAccount] = useState<'demo' | 'live'>('demo');
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const { user } = useAuth();
+
+  const { data: accounts } = useQuery({
+    queryKey: ['trading-accounts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trading_accounts')
+        .select('*')
+        .eq('user_id', user?.id);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  const currentAccount = accounts?.find(acc => acc.account_type === selectedAccount);
 
   const handleOrderClick = (type: 'buy' | 'sell') => {
     setOrderType(type);
@@ -21,6 +47,36 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)]">
+        {/* Account Selection and Balance */}
+        <div className="p-2 md:p-4">
+          <Card className="p-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-4">
+                <Select value={selectedAccount} onValueChange={(value: 'demo' | 'live') => setSelectedAccount(value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="demo">Demo Account</SelectItem>
+                    <SelectItem value="live">Live Account</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-lg font-semibold">
+                  Balance: ${currentAccount?.balance.toFixed(2) || '0.00'}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => setDepositModalOpen(true)}>
+                  Deposit
+                </Button>
+                <Button onClick={() => setWithdrawModalOpen(true)}>
+                  Withdraw
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Market Overview Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 p-2 md:p-4">
           <Card className="p-3 md:p-4">
@@ -123,15 +179,26 @@ const Dashboard = () => {
           </Card>
         </div>
 
+        {/* Order History */}
         <div className="p-2 md:p-4 md:mr-80">
           <OrderHistory />
         </div>
 
-        {/* Order Modal */}
+        {/* Modals */}
         <OrderModal
           isOpen={orderModalOpen}
           onClose={() => setOrderModalOpen(false)}
           type={orderType}
+        />
+        <DepositModal
+          isOpen={depositModalOpen}
+          onClose={() => setDepositModalOpen(false)}
+          accountType={selectedAccount}
+        />
+        <WithdrawModal
+          isOpen={withdrawModalOpen}
+          onClose={() => setWithdrawModalOpen(false)}
+          accountType={selectedAccount}
         />
       </div>
     </DashboardLayout>

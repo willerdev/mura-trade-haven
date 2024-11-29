@@ -7,8 +7,6 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import Deposit from "./pages/Deposit";
-import Withdraw from "./pages/Withdraw";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +15,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   
   if (!user) {
-    // Redirect to login if not authenticated
     console.log("User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
@@ -43,22 +40,6 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/deposit" 
-                element={
-                  <ProtectedRoute>
-                    <Deposit />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/withdraw" 
-                element={
-                  <ProtectedRoute>
-                    <Withdraw />
                   </ProtectedRoute>
                 } 
               />

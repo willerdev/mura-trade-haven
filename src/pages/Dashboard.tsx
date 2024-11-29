@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '../components/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import TradingViewChart from '../components/TradingViewChart';
 import TradingParameters from '../components/TradingParameters';
 import ViewTradingParameters from '../components/ViewTradingParameters';
 import OrderHistory from '../components/OrderHistory';
@@ -14,6 +13,17 @@ import WithdrawModal from '../components/WithdrawModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type ForexResponse = {
+  success: boolean;
+  base: string;
+  timestamp: number;
+  rates: {
+    EUR: number;
+    INR: number;
+    JPY: number;
+  };
+};
 
 const Dashboard = () => {
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -43,6 +53,20 @@ const Dashboard = () => {
     setOrderType(type);
     setOrderModalOpen(true);
   };
+
+  const { data: forexData, isLoading } = useQuery({
+    queryKey: ['forex-rates'],
+    queryFn: async () => {
+      const response = await fetch(
+        'https://api.forexrateapi.com/v1/latest?api_key=172e9aaa461812752d832aa64472e504&base=USD&currencies=EUR,INR,JPY'
+      );
+      return response.json();
+    },
+    // Cache for 5 minutes
+    staleTime: 250 * 60 * 1000,
+    // Refetch in background every 5 minutes
+    refetchInterval: 250 * 60 * 1000
+  });
 
   return (
     <DashboardLayout>
@@ -80,30 +104,40 @@ const Dashboard = () => {
         {/* Market Overview Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 p-2 md:p-4">
           <Card className="p-3 md:p-4">
-            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">BTC/USDT</h3>
-            <div className="text-lg md:text-2xl font-bold text-green-500">$45,123.45</div>
-            <div className="text-xs md:text-sm text-green-500">+2.34%</div>
+            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">USD/EUR</h3>
+            <div className="text-lg md:text-2xl font-bold">
+              €{forexData?.rates.EUR.toFixed(4) || '...'}
+            </div>
+            <div className="text-xs md:text-sm text-muted-foreground">Base: USD</div>
           </Card>
           <Card className="p-3 md:p-4">
-            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">ETH/USDT</h3>
-            <div className="text-lg md:text-2xl font-bold text-red-500">$2,891.12</div>
-            <div className="text-xs md:text-sm text-red-500">-1.12%</div>
+            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">USD/INR</h3>
+            <div className="text-lg md:text-2xl font-bold">
+              ₹{forexData?.rates.INR.toFixed(2) || '...'}
+            </div>
+            <div className="text-xs md:text-sm text-muted-foreground">Base: USD</div>
           </Card>
           <Card className="p-3 md:p-4">
-            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">24h Volume</h3>
-            <div className="text-lg md:text-2xl font-bold">$1.2B</div>
-            <div className="text-xs md:text-sm text-muted-foreground">Across all pairs</div>
+            <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">USD/JPY</h3>
+            <div className="text-lg md:text-2xl font-bold">
+              ¥{forexData?.rates.JPY.toFixed(2) || '...'}
+            </div>
+            <div className="text-xs md:text-sm text-muted-foreground">Base: USD</div>
           </Card>
           <Card className="p-3 md:p-4">
             <h3 className="text-xs md:text-sm font-semibold text-muted-foreground mb-1 md:mb-2">Market Status</h3>
-            <div className="text-lg md:text-2xl font-bold text-green-500">Active</div>
-            <div className="text-xs md:text-sm text-muted-foreground">All systems operational</div>
+            <div className={`text-lg md:text-2xl font-bold ${isLoading ? 'text-yellow-500' : 'text-green-500'}`}>
+              {isLoading ? 'Loading' : 'Active'}
+            </div>
+            <div className="text-xs md:text-sm text-muted-foreground">
+              Last update: {forexData ? new Date(forexData.timestamp * 1000).toLocaleTimeString() : '...'}
+            </div>
           </Card>
         </div>
 
         {/* Main Chart Area */}
         <div className="flex-grow p-2 md:p-4">
-          <TradingViewChart />
+          {/* TradingViewChart */}
         </div>
 
         {/* Trading Controls - Mobile Optimized */}

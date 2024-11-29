@@ -39,7 +39,7 @@ const Login = () => {
       <Card className="w-full max-w-md p-6">
         <div className="flex justify-center mb-6">
           <img 
-            src="https://www.nicepng.com/png/detail/207-2077371_bots-instagram-logo-round-blue.png" 
+            src="https://solanatradingbots.com/wp-content/uploads/2024/03/cropped-solana-trading-bots-logo-shadow-1.png" 
             alt="Logo" 
             className="w-24 h-24 object-contain"
           />

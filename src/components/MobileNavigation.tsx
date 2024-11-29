@@ -4,6 +4,11 @@ import { Home, LineChart, BarChart2, Layout, User } from 'lucide-react';
 const MobileNavigation = () => {
   const location = useLocation();
   
+  // Hide navigation on login and signup pages
+  if (location.pathname === '/login' || location.pathname === '/signup') {
+    return null;
+  }
+  
   const isActive = (path: string) => location.pathname === path;
   
   return (

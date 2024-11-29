@@ -19,9 +19,10 @@ interface WithdrawModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountType: 'demo' | 'live';
+  onSuccess?: () => void;
 }
 
-const WithdrawModal = ({ isOpen, onClose, accountType }: WithdrawModalProps) => {
+const WithdrawModal = ({ isOpen, onClose, accountType, onSuccess }: WithdrawModalProps) => {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [walletAddress, setWalletAddress] = useState('');
@@ -34,23 +35,48 @@ const WithdrawModal = ({ isOpen, onClose, accountType }: WithdrawModalProps) => 
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
+      // First check if user has sufficient balance
+      const { data: accounts } = await supabase
+        .from('trading_accounts')
+        .select('balance')
+        .eq('user_id', user.id)
+        .eq('account_type', accountType)
+        .single();
+
+      if (!accounts || accounts.balance < parseFloat(amount)) {
+        throw new Error('Insufficient balance');
+      }
+
+      // Create withdrawal record
+      const { error: withdrawalError } = await supabase
         .from('withdrawals')
         .insert({
           user_id: user.id,
           amount: parseFloat(amount),
           currency,
           wallet_address: walletAddress,
-          status: 'pending'
+          status: 'completed' // Auto-complete for demo purposes
         });
 
-      if (error) throw error;
+      if (withdrawalError) throw withdrawalError;
+
+      // Update account balance
+      const { error: updateError } = await supabase
+        .from('trading_accounts')
+        .update({ 
+          balance: supabase.rpc('decrement', { x: parseFloat(amount) })
+        })
+        .eq('user_id', user.id)
+        .eq('account_type', accountType);
+
+      if (updateError) throw updateError;
 
       toast({
-        title: "Withdrawal Requested",
-        description: `Your withdrawal request for ${amount} ${currency} has been submitted.`,
+        title: "Withdrawal Successful",
+        description: `Your withdrawal of ${amount} ${currency} has been processed.`,
       });
 
+      onSuccess?.();
       onClose();
     } catch (error: any) {
       console.error('Withdrawal error:', error.message);

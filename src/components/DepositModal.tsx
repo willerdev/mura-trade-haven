@@ -19,9 +19,10 @@ interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountType: 'demo' | 'live';
+  onSuccess?: () => void;
 }
 
-const DepositModal = ({ isOpen, onClose, accountType }: DepositModalProps) => {
+const DepositModal = ({ isOpen, onClose, accountType, onSuccess }: DepositModalProps) => {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [walletAddress, setWalletAddress] = useState('');
@@ -34,30 +35,43 @@ const DepositModal = ({ isOpen, onClose, accountType }: DepositModalProps) => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
+      // First create deposit record
+      const { error: depositError } = await supabase
         .from('deposits')
         .insert({
           user_id: user.id,
           amount: parseFloat(amount),
           currency,
           wallet_address: walletAddress,
-          status: 'pending'
+          status: 'completed' // Auto-complete for demo purposes
         });
 
-      if (error) throw error;
+      if (depositError) throw depositError;
+
+      // Then update account balance
+      const { error: updateError } = await supabase
+        .from('trading_accounts')
+        .update({ 
+          balance: supabase.rpc('increment', { x: parseFloat(amount) })
+        })
+        .eq('user_id', user.id)
+        .eq('account_type', accountType);
+
+      if (updateError) throw updateError;
 
       toast({
-        title: "Deposit Initiated",
-        description: `Your deposit request for ${amount} ${currency} has been initiated.`,
+        title: "Deposit Successful",
+        description: `Your deposit of ${amount} ${currency} has been processed.`,
       });
 
+      onSuccess?.();
       onClose();
     } catch (error: any) {
       console.error('Deposit error:', error.message);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to initiate deposit",
+        description: error.message || "Failed to process deposit",
       });
     } finally {
       setIsSubmitting(false);
@@ -110,7 +124,7 @@ const DepositModal = ({ isOpen, onClose, accountType }: DepositModalProps) => {
                 className="col-span-3"
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
-                placeholder="Enter wallet address"
+                required={currency !== 'USD'}
               />
             </div>
           )}

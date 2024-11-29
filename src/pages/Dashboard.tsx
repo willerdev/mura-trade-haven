@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '../components/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -23,8 +23,8 @@ const Dashboard = () => {
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const { user } = useAuth();
 
-  const { data: accounts } = useQuery({
-    queryKey: ['trading-accounts'],
+  const { data: accounts, refetch: refetchAccounts } = useQuery({
+    queryKey: ['trading-accounts', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trading_accounts')
@@ -194,11 +194,13 @@ const Dashboard = () => {
           isOpen={depositModalOpen}
           onClose={() => setDepositModalOpen(false)}
           accountType={selectedAccount}
+          onSuccess={refetchAccounts}
         />
         <WithdrawModal
           isOpen={withdrawModalOpen}
           onClose={() => setWithdrawModalOpen(false)}
           accountType={selectedAccount}
+          onSuccess={refetchAccounts}
         />
       </div>
     </DashboardLayout>

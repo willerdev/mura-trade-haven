@@ -81,14 +81,14 @@ const TradingActivationModal = () => {
             onClick={() => handleActivation('Automatic')}
             className="h-24"
           >
-            Activate Automatic Trading
+     Automatic Trading
           </Button>
           <Button
             variant={!isAutomatic ? "default" : "outline"}
             onClick={() => handleActivation('Manual')}
             className="h-24"
           >
-            Activate Manual Trading
+          Manual Trading
           </Button>
         </div>
       </DialogContent>

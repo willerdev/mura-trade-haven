@@ -49,11 +49,20 @@ const DepositModal = ({ isOpen, onClose, accountType, onSuccess }: DepositModalP
       if (depositError) throw depositError;
 
       // Then update account balance
+      const { data: currentAccount } = await supabase
+        .from('trading_accounts')
+        .select('balance')
+        .eq('user_id', user.id)
+        .eq('account_type', accountType)
+        .single();
+
+      if (!currentAccount) throw new Error('Account not found');
+
+      const newBalance = currentAccount.balance + parseFloat(amount);
+
       const { error: updateError } = await supabase
         .from('trading_accounts')
-        .update({ 
-          balance: supabase.rpc('increment', { x: parseFloat(amount) })
-        })
+        .update({ balance: newBalance })
         .eq('user_id', user.id)
         .eq('account_type', accountType);
 

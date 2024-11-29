@@ -7,10 +7,14 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Markets from "./pages/Markets";
+import Trade from "./pages/Trade";
+import Positions from "./pages/Positions";
+import Account from "./pages/Account";
+import MobileNavigation from "./components/MobileNavigation";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   
@@ -43,9 +47,42 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/markets" 
+                element={
+                  <ProtectedRoute>
+                    <Markets />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/trade" 
+                element={
+                  <ProtectedRoute>
+                    <Trade />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/positions" 
+                element={
+                  <ProtectedRoute>
+                    <Positions />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/account" 
+                element={
+                  <ProtectedRoute>
+                    <Account />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
+            <MobileNavigation />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

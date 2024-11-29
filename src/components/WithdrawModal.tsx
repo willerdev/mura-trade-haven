@@ -36,14 +36,14 @@ const WithdrawModal = ({ isOpen, onClose, accountType, onSuccess }: WithdrawModa
     
     try {
       // First check if user has sufficient balance
-      const { data: accounts } = await supabase
+      const { data: currentAccount } = await supabase
         .from('trading_accounts')
         .select('balance')
         .eq('user_id', user.id)
         .eq('account_type', accountType)
         .single();
 
-      if (!accounts || accounts.balance < parseFloat(amount)) {
+      if (!currentAccount || currentAccount.balance < parseFloat(amount)) {
         throw new Error('Insufficient balance');
       }
 
@@ -61,11 +61,11 @@ const WithdrawModal = ({ isOpen, onClose, accountType, onSuccess }: WithdrawModa
       if (withdrawalError) throw withdrawalError;
 
       // Update account balance
+      const newBalance = currentAccount.balance - parseFloat(amount);
+      
       const { error: updateError } = await supabase
         .from('trading_accounts')
-        .update({ 
-          balance: supabase.rpc('decrement', { x: parseFloat(amount) })
-        })
+        .update({ balance: newBalance })
         .eq('user_id', user.id)
         .eq('account_type', accountType);
 
